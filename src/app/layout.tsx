@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ConfigurationProvider } from "@/lib/contexts/ConfigurationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {/* 2. ENVUELVE A LOS HIJOS (CHILDREN) CON EL PROVEEDOR */}
+        <ConfigurationProvider>
+          {children}
+        </ConfigurationProvider>
+      </body>
     </html>
   );
 }
