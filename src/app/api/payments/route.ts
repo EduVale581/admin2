@@ -1,14 +1,29 @@
 import { query } from "@/lib/db";
+import { createCommissionCalculator } from "@/lib/commissionFactory";
+import type { CommissionRules } from "@/lib/contexts/ConfigurationContext";
 
 type CreatePaymentBody = {
   serviceId: string;
   amount: number;
+  rules: CommissionRules; // <-- Añadimos las reglas al tipo
 };
 
 export async function POST(req: Request) {
   const body = (await req.json()) as Partial<CreatePaymentBody>;
-  const commissionAmount = body.amount * 0.1;
 
+  // 1. SOLUCIÓN TÉCNICA: Validar que todos los datos existan antes de hacer cálculos
+  if (!body.amount || !body.serviceId || !body.rules) {
+    return Response.json(
+      { error: "Faltan datos requeridos (serviceId, amount o rules)" }, 
+      { status: 400 }
+    );
+  }
+
+  // 2. SOLUCIÓN DE NEGOCIO: Aplicar Regla de Oro (Cero hardcoding)
+  const calculate = createCommissionCalculator(body.rules);
+  const commissionAmount = calculate([body.amount]);
+
+  // Insertar el pago en la base de datos
   const paymentResult = await query<{
     id: string;
     service_id: string;
@@ -26,6 +41,7 @@ export async function POST(req: Request) {
 
   const payment = paymentResult.rows[0];
 
+  // Insertar la comisión calculada dinámicamente en la base de datos
   const commissionResult = await query<{
     id: string;
     payment_id: string;
@@ -36,7 +52,7 @@ export async function POST(req: Request) {
       values ($1, $2)
       returning id, payment_id, amount
     `,
-    [payment.id, commissionAmount],
+    [payment.id, commissionAmount], // Usamos el valor dinámico
   );
 
   return Response.json({
