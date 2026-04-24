@@ -45,8 +45,9 @@ export async function POST(req: Request) {
 
     const { companyId, name, price, status } = body;
 
-    if (!companyId || !name || typeof price !== "number" || price <= 0) {
-      return Response.json({ error: "Datos inconsistentes." }, { status: 400 });
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!companyId || !uuidRegex.test(companyId) || !name || typeof price !== "number" || price <= 0) {
+      return Response.json({ error: "Datos inconsistentes o ID inválido." }, { status: 400 });
     }
 
     const companyCheck = await query("SELECT id FROM companies WHERE id = $1", [

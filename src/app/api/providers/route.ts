@@ -33,9 +33,10 @@ export async function POST(req: Request) {
       providerName?: string;
     };
 
-    if (!body.paymentId || !body.providerName) {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!body.paymentId || !uuidRegex.test(body.paymentId) || !body.providerName) {
       return Response.json(
-        { error: "paymentId y providerName son requeridos" },
+        { error: "paymentId (válido) y providerName son requeridos" },
         { status: 400 }
       );
     }

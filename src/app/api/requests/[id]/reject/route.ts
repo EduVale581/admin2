@@ -9,7 +9,7 @@ export async function POST(
         const { id } = await params;
 
         // 1. Verificamos estado actual
-        const check = await query<AppRequest>("SELECT status FROM requests WHERE id = $1", [id]);
+        const check = await query<AppRequest>("SELECT status FROM companies WHERE id = $1", [id]);
 
         if (check.rowCount === 0) {
             return Response.json({ error: "Solicitud no encontrada" }, { status: 404 });
@@ -21,7 +21,7 @@ export async function POST(
 
         // 2. Actualizamos el estado a 'rejected'
         const update = await query<AppRequest>(
-            "UPDATE requests SET status = 'rejected' WHERE id = $1 RETURNING *",
+            "UPDATE companies SET status = 'rejected' WHERE id = $1 RETURNING *",
             [id]
         );
 

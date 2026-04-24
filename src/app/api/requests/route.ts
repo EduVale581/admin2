@@ -4,7 +4,7 @@ import type { Request as AppRequest } from "@/lib/types";
 export async function GET() {
     try {
         // Consultamos todas las solicitudes ordenadas por ID
-        const result = await query<AppRequest>("SELECT * FROM requests ORDER BY id DESC");
+        const result = await query<AppRequest>("SELECT * FROM companies ORDER BY id DESC");
 
         return Response.json(result.rows, { status: 200 });
     } catch (error) {
