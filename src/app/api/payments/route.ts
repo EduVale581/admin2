@@ -8,13 +8,35 @@ type CreatePaymentBody = {
   rules: CommissionRules; // <-- Añadimos las reglas al tipo
 };
 
+export async function GET() {
+  try {
+    const sql = `
+
+   SELECT * 
+
+   FROM payments
+  `;
+
+    const res = await query(sql);
+
+    return Response.json(res.rows);
+  } catch (error) {
+    console.error("Error obteniendo servicios:", error);
+
+    return Response.json(
+      { error: "Error interno del servidor" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST(req: Request) {
   const body = (await req.json()) as Partial<CreatePaymentBody>;
 
   // 1. SOLUCIÓN TÉCNICA: Validar que todos los datos existan antes de hacer cálculos
   if (!body.amount || !body.serviceId || !body.rules) {
     return Response.json(
-      { error: "Faltan datos requeridos (serviceId, amount o rules)" }, 
+      { error: "Faltan datos requeridos (serviceId, amount o rules)" },
       { status: 400 }
     );
   }
