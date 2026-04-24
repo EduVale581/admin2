@@ -11,5 +11,10 @@ export default function ProvidersPage() {
     api.get("/api/providers").then(setData);
   }, []);
 
-  return <Table data={data} />;
+  return (
+    <div className="container">
+      <h1>Pagos a Proveedores</h1>
+      <Table data={data} />
+    </div>
+  );
 }

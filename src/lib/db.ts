@@ -1,3 +1,5 @@
+require('dotenv').config();  // Carga las variables del archivo .env
+
 import { Pool, type QueryResultRow } from "pg";
 
 type GlobalWithPool = typeof globalThis & {
@@ -13,7 +15,7 @@ if (!process.env.DATABASE_URL) {
 const pool =
   globalForDb.__dbPool ??
   new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL,  // Usa la URL de la base de datos definida en .env
     ssl: {
       rejectUnauthorized: false,
     },
@@ -23,10 +25,7 @@ if (process.env.NODE_ENV !== "production") {
   globalForDb.__dbPool = pool;
 }
 
-export async function query<T extends QueryResultRow>(
-  text: string,
-  params: unknown[] = [],
-) {
+export async function query<T extends QueryResultRow>(text: string, params: unknown[] = []) {
   const result = await pool.query<T>(text, params);
   return result;
 }
