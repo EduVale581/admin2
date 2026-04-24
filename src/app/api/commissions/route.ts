@@ -34,10 +34,11 @@ export async function POST(req: Request) {
     // Si mandaron 'totalAmount', también funciona. Ningún error 500.
     const actualAmount = body.amount || body.totalAmount;
     
-    // 1. Validamos que nos manden el monto, las reglas y el ID del pago
-    if (typeof actualAmount !== "number" || actualAmount <= 0 || !body.rules || !body.paymentId) {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    // 1. Validamos que nos manden el monto, las reglas y el ID del pago (UUID válido)
+    if (typeof actualAmount !== "number" || actualAmount <= 0 || !body.rules || !body.paymentId || !uuidRegex.test(body.paymentId)) {
       return Response.json(
-        { error: "Faltan datos requeridos (monto, reglas o paymentId) o el monto es inválido" },
+        { error: "Faltan datos requeridos (monto, reglas o paymentId válido) o el monto es inválido" },
         { status: 400 }
       );
     }
@@ -49,7 +50,7 @@ export async function POST(req: Request) {
     // 3. TÚ insertas la comisión en la base de datos (Plan B activado)
     // Insertamos solo 2 variables, Supabase autogenerará el 'id'
     await query(
-      `INSERT INTO commissions ("paymentId", amount) VALUES ($1, $2)`,
+      `INSERT INTO commissions (payment_id, amount) VALUES ($1, $2)`,
       [body.paymentId, commissionAmount]
     );
 
