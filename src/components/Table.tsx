@@ -1,5 +1,5 @@
 export default function Table({ data }: { data: unknown[] }) {
-  if (!data || data.length === 0) return <p>Sin datos</p>;
+  if (!Array.isArray(data) || data.length === 0 || !data[0]) return <p>Sin datos disponibles</p>;
 
   const keys = Object.keys(data[0] as object);
 
